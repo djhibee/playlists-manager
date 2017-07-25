@@ -25,9 +25,9 @@ export CONFIG_LOSSLESS="$SCRIPTS_DIRECTORY/config-lossless.yaml"
 # DB were to store playlists and pairs
 export SQLITEDB="$SCRIPTS_DIRECTORY/tests/musicPairsAndPlaylists.db"
 # Directory where manual playlists are stored (audio station playlists etc...)
-export PLAYLIST_DIRECTORY_TO_BACKUP="$SCRIPTS_DIRECTORY/testFiles/playlists-lossy"
+export PLAYLIST_DIRECTORY_TO_BACKUP="$SCRIPTS_DIRECTORY/test/playlists-lossy"
 # Directory where max quality and min quality playlists are generated
-export GENERATED_PLAYLIST_DIRECTORY="$SCRIPTS_DIRECTORY/testFiles/playlists-generated"
+export GENERATED_PLAYLIST_DIRECTORY="$SCRIPTS_DIRECTORY/test/playlists-generated"
 # Default directory for playlists generation
 export PLAYLIST_DIRECTORY_DEFAULT=$PLAYLIST_DIRECTORY_TO_BACKUP
 # Directory for lossy music files. Do not append a / at the end

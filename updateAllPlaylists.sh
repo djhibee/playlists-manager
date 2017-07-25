@@ -119,7 +119,7 @@ echo "Starting update of playlists in $PLAYLIST_DIRECTORY_TO_BACKUP..."
 # Get dynamic rating playlists from AudioStation
 for i in `seq 1 5`
 do
-  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH "$i" "$PLAYLIST_DIRECTORY_TO_BACKUP"
+  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH -r "$i" -p "$PLAYLIST_DIRECTORY_TO_BACKUP"
 done
 
 # filter only .m3u file from given PLAYLIST_DIRECTORY_TO_BACKUP
@@ -297,6 +297,7 @@ done < "playlists.tmp"
 # creationDate=`echo $playlist|awk -F _ '{print $1$2}'|sed 's/h//g'`
 # backup PLAYLIST_DIRECTORY_TO_BACKUP  to FULL_BACKUP_DIRECTORY
 echo "Backup full playlist repo"
+[ ! -d "$FULL_BACKUP_DIRECTORY" ] && { mkdir "$FULL_BACKUP_DIRECTORY" ; }
 cp -a "$PLAYLIST_DIRECTORY_TO_BACKUP" "$FULL_BACKUP_DIRECTORY/playlists-$timestamp"
 #delete useless @eadir direcotries
 find "$FULL_BACKUP_DIRECTORY/playlists-$timestamp" -type d -name "@eaDir" -print0 | xargs -0 rm -rf
