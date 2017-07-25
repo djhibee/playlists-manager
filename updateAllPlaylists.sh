@@ -281,8 +281,8 @@ while read filePlaylist; do
                        ORDER BY PLAYORDER ASC
                        ; "
     sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
-  else
-    
+  
+
   fi
 
   # Clean files

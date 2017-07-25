@@ -66,7 +66,7 @@
 FILE_PLAYLIST_DEFAULT="./toto.m3u"
 # Store processed files in order not to re-process them
 # in case of a stop before the full parsing of the playlist
-PROCESSED_FILE_DEFAULT="./processedFiles.txt"
+PROCESSED_FILE_DEFAULT="./processedFiles.tmp"
 # Comment update option chosen by default if not provided in input
 UPDATE_OPERATION_DEFAULT=$ADD_OPTION
 ######## Shell variables ##########
@@ -201,10 +201,10 @@ function initialize {
     ;;
   esac
 
-  export PAIR_NOT_FOUND_LIST="$playlistName.pairsNotFound.txt"
-  export MAIN_FILE_NOT_FOUND_LIST="$playlistName.NotFoundInBeets.txt"
-  export MAIN_FILE_ONE_STAR_LIST="$playlistName.noPairAndOneStar.txt"
-  export LAST_CHANCE_MATCHES_TO_REVIEW="$playlistName.matchesToReview.txt"
+  export PAIR_NOT_FOUND_LIST="$PLAYLIST_DIRECTORY_TO_BACKUP/$playlistName.pairsNotFound.txt"
+  export MAIN_FILE_NOT_FOUND_LIST="$PLAYLIST_DIRECTORY_TO_BACKUP/$playlistName.NotFoundInBeets.txt"
+  export MAIN_FILE_ONE_STAR_LIST="$PLAYLIST_DIRECTORY_TO_BACKUP/$playlistName.noPairAndOneStar.txt"
+  export LAST_CHANCE_MATCHES_TO_REVIEW="$PLAYLIST_DIRECTORY_TO_BACKUP/$playlistName.matchesToReview.txt"
 
   log "Processed music list is: $playlistFile"
   log "Music files with no pair dumped in $PAIR_NOT_FOUND_LIST"
