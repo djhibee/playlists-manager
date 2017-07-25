@@ -37,7 +37,7 @@
 # Synology user
 SYNO_SS_USER="toto"
 # Corresponding pwd
-SYNO_SS_PASS="xxxxxxxxxx"
+SYNO_SS_PASS="thePass"
 # Syno server address
 SYNO_URL="192.168.0.20:5001"
 debug_mode=${debug_mode:-1}
@@ -157,10 +157,10 @@ _checkSynoResponse "$RESPONSE";
 numberOfSongs="`cat <<< "$RESPONSE" | jq '.data.total'`"
 echo "Number of songs: $numberOfSongs"
 # We overite the playlist if it exists
-echo "#EXTM3U" > "$playlistFile"
+#echo "#EXTM3U" > "$playlistFile"
 # Replace "/music/ by musicDirectory to have aboslute music paths and remove the " at the end
 # WARNING! DEPENDS ON YOUR MUSIC DIRECTORY PATH
-cat <<< "$RESPONSE" | jq ".data.songs[].path" | sed "s|\"\/music\/|${musicDirectory}\/|" | sed 's/.$//' >> "$playlistFile"
+cat <<< "$RESPONSE" | jq ".data.songs[].path" | sed "s|\"\/music\/|${musicDirectory}\/|" | sed 's/.$//' > "$playlistFile"
 
 ## 3.step logout  ##
 VER=4
