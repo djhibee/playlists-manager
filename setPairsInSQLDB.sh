@@ -113,7 +113,7 @@ function cleanLastChanceMatchesFromDB {
   idToDelete=`sqlite3 $SQLITEDB <<< "$getIDToCleanDBRequest"`
   #set +x
 
-  if [[ ! -z "$idToDelete" ]]
+  if [[ -n "$idToDelete" ]]
   then
     #set -x
     deleteDBRequest="DELETE
@@ -196,7 +196,7 @@ do
                         AND $C1_QUALITY=\"\"
                         ;"
     isPairOrphanPresent=`sqlite3 $SQLITEDB <<< "$checkPairDBRequest"`
-    if [[ ! -z "$isPairOrphanPresent" ]]
+    if [[ -n "$isPairOrphanPresent" ]]
     then # Pair Orphan is reused instead of creating another line
       log "Pair File $pairFile already present in DB but orphan: entry with ID $isPairOrphanPresent is reused"
       #startIndex=$((startIndex - 1))
@@ -215,7 +215,7 @@ do
                           ;"
 
       isMainOrphanPresent=`sqlite3 $SQLITEDB <<< "$checkMainDBRequest"`
-      if [[ ! -z "$isMainOrphanPresent" ]]
+      if [[ -n "$isMainOrphanPresent" ]]
       then
         # Main Orphan is reused instead of creating another line
         log "Main File $mainFile already present in DB but orphan: entry with ID $isMainOrphanPresent is reused"
@@ -238,7 +238,7 @@ do
                                AND MATCH_TYPE=0
                                ;"
           isTuplePresent=`sqlite3 $SQLITEDB <<< "$checkTupleDBRequest"`
-          if [[ ! -z "$isTuplePresent" ]]
+          if [[ -n "$isTuplePresent" ]]
           then
             # tuple is reused instead of creating another line
             #log "Tuple (\"$mainFile\":\"$pairFile\") already present in DB, entry \"$isTuplePresent\" is reused"

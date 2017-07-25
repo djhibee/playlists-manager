@@ -1,4 +1,4 @@
-#!/bin/bash
+-n#!/bin/bash
 # May be easily converted to sh compatible script if needed, since a very few bashisms are used ([[]]...)
 
 # Synopsis :
@@ -285,7 +285,7 @@ while read file; do
     # Handle main file not found error
     [ $? -eq 100 ] && {  countMainFilesNotFound=$((countMainFilesNotFound + 1)) ; }
     # Update stats and debug logs
-    if [[ ! -z "$pairFilePath" ]]
+    if [[ -n "$pairFilePath" ]]
     then
       log "$pairFilePath was found as pair"
     else
@@ -309,7 +309,7 @@ while read file; do
 
       # we also update the comments of the pair file in beets but not in the DB!
       # in case of remove, only one instance will be removed from beets' comments
-      [[ ! -z "$pairFilePath" ]] && {
+      [[ -n "$pairFilePath" ]] && {
         echo "Overwriting comments only for pair file $pairFilePath"
         $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -s "$pairFilePath" -p "$playlistName" -u "$updateOperation" -r "$playlistOrder" | sed 's/^/     /'
       }
@@ -318,7 +318,7 @@ while read file; do
       # for add Option, we want to add the song at the end of the playlist
       echo "Add main file $fileProper at the end of the playlist"
       $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -d -s "$fileProper" -p "$playlistName" -u "$ADD_OPTION" -r 0 | sed 's/^/     /'
-      [[ ! -z "$pairFilePath" ]] && {
+      [[ -n "$pairFilePath" ]] && {
         echo "Add pair file $pairFilePath at the end of the playlist"
         $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -s "$pairFilePath" -p "$playlistName" -u "$ADD_OPTION" -r 0 | sed 's/^/     /'
       }
@@ -327,7 +327,7 @@ while read file; do
       # for remove option, we want to remove only the last occurence of the song
       echo "Remove main file $fileProper from the end of the playlist"
       $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -d -s "$fileProper" -p "$playlistName" -u "$REMOVE_OPTION" -r 0 | sed 's/^/     /'
-      [[ ! -z "$pairFilePath" ]] && {
+      [[ -n "$pairFilePath" ]] && {
         echo "Remove pair file $pairFilePath from the end of the playlist"
         $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -s "$pairFilePath" -p "$playlistName" -u "$REMOVE_OPTION" -r 0 | sed 's/^/     /'
       }

@@ -19,15 +19,15 @@
 # Directory where all music scripts are stored
 export SCRIPTS_DIRECTORY="/Users/jchapeland/git_clones/playlists-manager"
 # Beets' config for lossy files
-export CONFIG_LOSSY="$SCRIPTS_DIRECTORY/config.yaml"
+export CONFIG_LOSSY="$SCRIPTS_DIRECTORY/beetFiles/config.yaml"
 # Beets' config for lossless files
-export CONFIG_LOSSLESS="$SCRIPTS_DIRECTORY/config-lossless.yaml"
+export CONFIG_LOSSLESS="$SCRIPTS_DIRECTORY/beetFiles/config-lossless.yaml"
 # DB were to store playlists and pairs
 export SQLITEDB="$SCRIPTS_DIRECTORY/tests/musicPairsAndPlaylists.db"
 # Directory where manual playlists are stored (audio station playlists etc...)
-export PLAYLIST_DIRECTORY_TO_BACKUP="$SCRIPTS_DIRECTORY/test/playlists-lossy"
+export PLAYLIST_DIRECTORY_TO_BACKUP="$SCRIPTS_DIRECTORY/tests/playlists-lossy"
 # Directory where max quality and min quality playlists are generated
-export GENERATED_PLAYLIST_DIRECTORY="$SCRIPTS_DIRECTORY/test/playlists-generated"
+export GENERATED_PLAYLIST_DIRECTORY="$SCRIPTS_DIRECTORY/tests/playlists-generated"
 # Default directory for playlists generation
 export PLAYLIST_DIRECTORY_DEFAULT=$PLAYLIST_DIRECTORY_TO_BACKUP
 # Directory for lossy music files. Do not append a / at the end

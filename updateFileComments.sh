@@ -97,7 +97,7 @@ function datacheck {
     #[ ! -f "$fileToUpdate" ] && { endProg 300 ": $fileToUpdate is not a file." ; }
     [[ ( -z "${fileToUpdate// }" ) || ( -z "${playlistName// }" ) ]] && { endProg 1 ": song file and playlist name are mandatory parameters (see --help) " ; }
     [ $updateOperation != "$REMOVE_OPTION" ] && [ $updateOperation != "$ADD_OPTION" ] && { endProg 900 ": update operation can only be \"$ADD_OPTION\" or \"$REMOVE_OPTION\" (see --help) " ; }
-    [[ ! -z "$isRatingPlaylist" ]] && [[ $updateDB -eq 1 ]] && { updateDB=0 ; echo "Update DB option forced to 0 because $playlistName is a rating playlist." ; }
+    [[ -n "$isRatingPlaylist" ]] && [[ $updateDB -eq 1 ]] && { updateDB=0 ; echo "Update DB option forced to 0 because $playlistName is a rating playlist." ; }
 }
 
 # Set global attributes and log few pieces of info
@@ -293,7 +293,7 @@ function addOrRemoveSongFromPlaylist {
       log "Update comments with config $configToUse and option $updateOperation"
       isRatingPresentInComments=`echo $oldComments | grep -e "$playlistName"`
       # dont add ratings more than once in the beet's comments
-      if [[ ! -z "$isRatingPlaylist" ]] && [[ ! -z "$isRatingPresentInComments" ]]
+      if [[ -n "$isRatingPlaylist" ]] && [[ -n "$isRatingPresentInComments" ]]
       then
         log "Rating already stored in Beet's comments. No need to add it."
         newComments="$oldComments"

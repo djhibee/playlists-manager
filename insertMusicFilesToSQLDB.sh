@@ -69,6 +69,7 @@ function usage {
              -f: file containing songs' paths to insert in DB
              -h --help : Display this message
              -l: try to match by artist and title in last chance match for pair songs
+             
 
         "
   exit 0

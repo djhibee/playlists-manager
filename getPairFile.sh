@@ -186,7 +186,7 @@ function getPairFile {
     # } must be escaped with $ (see beet doc)
     data=$(beet  -c $configMainFile list -f '$artist$}$album$}$title$}$mb_trackid$}$mb_albumid$}$comments' path:"$mainFile")
     log "data: $data"
-    if [[ ! -z "$data" ]]
+    if [[ -n "$data" ]]
     then # mainFile was found in beet DB
 
       #startIndex=$((startIndex + 1))
@@ -263,7 +263,7 @@ function addFilesInDB {
 
   if [ "$updateDB" -eq 1 ] && [ $tupleAlreadyInDB -eq 0 ]
   then
-    if [[ ! -z "$pairFilePath" ]]
+    if [[ -n "$pairFilePath" ]]
     then
       # pair song was found : insert tuple in sqlite database
       # check if pair file already present in DB as orphan in order not to create fake orphans
@@ -276,7 +276,7 @@ function addFilesInDB {
                           AND $mainFileQuality=\"\"
                           ;"
       isPairOrphanPresent=`sqlite3 $SQLITEDB <<< "$checkPairDBRequest"`
-      if [[ ! -z "$isPairOrphanPresent" ]]
+      if [[ -n "$isPairOrphanPresent" ]]
       then # Pair Orphan is reused instead of creating another line
         log "Pair File $pairFilePath already present in DB but orphan: entry with ID $isPairOrphanPresent is reused"
         echo "$isPairOrphanPresent|$mainFile|$pairFilePath|$matchType"
@@ -294,7 +294,7 @@ function addFilesInDB {
                             AND $pairFileQuality=\"\"
                             ;"
         isMainOrphanPresent=`sqlite3 $SQLITEDB <<< "$checkMainDBRequest"`
-        if [[ ! -z "$isMainOrphanPresent" ]]
+        if [[ -n "$isMainOrphanPresent" ]]
         then
           deleteDBRequest="DELETE
                            FROM FILES
@@ -309,7 +309,7 @@ function addFilesInDB {
                             AND $pairFileQuality=\"\"
                             ;"
         isMainOrphanPresent=`sqlite3 $SQLITEDB <<< "$checkMainDBRequest"`
-        if [[ ! -z "$isMainOrphanPresent" ]]
+        if [[ -n "$isMainOrphanPresent" ]]
         then
           # Main Orphan is reused instead of creating another line
           log "Main File $mainFile already present in DB but orphan: entry with ID $isMainOrphanPresent is reused"
@@ -386,7 +386,7 @@ function cleanLastChanceMatchesFromDB {
                         ;"
   idToDelete=`sqlite3 $SQLITEDB <<< "$getIDToCleanDBRequest"`
 
-  if [[ ! -z "$idToDelete" ]]
+  if [[ -n "$idToDelete" ]]
   then
     echo "Delete line $idToDelete because of perfect match for $mainFile and $pairFilePath "
     deleteDBRequest="DELETE

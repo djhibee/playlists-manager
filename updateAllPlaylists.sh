@@ -54,9 +54,9 @@
 ####################################
 
 # Directory where all music related stuff is backuped
-FULL_BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/testFiles/backups-full"
+FULL_BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/tests/backups-full"
 # Directory where playlists are backuped
-BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/testFiles/backups"
+BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/tests/backups"
 debug_mode=${debug_mode:-1}
 
 #######################
@@ -107,6 +107,9 @@ function initialize {
     esac
   done
   log "Las chance match option is set to $useLastChanceMatch"
+
+  [ ! -d "$PLAYLIST_DIRECTORY_TO_BACKUP" ] && { mkdir "$PLAYLIST_DIRECTORY_TO_BACKUP" ; }
+  [ ! -d "$BACKUP_DIRECTORY" ] && { mkdir "$BACKUP_DIRECTORY" ; }
 }
 
 
@@ -138,7 +141,7 @@ while read filePlaylist; do
   echo "Previous $playlistName is backuped in $newBackup"
 
   # Since rating playlists are not stored in DB, we create them from beets
-  if [[ ! -z "$isRatingPlaylist" ]]
+  if [[ -n "$isRatingPlaylist" ]]
   then
     echo "$playlistName is a rating playlist. No storage will be done in DB table."
     beet -c $CONFIG_LOSSY list -p "comments:$playlistName"  > "$newBackup"
@@ -168,7 +171,7 @@ while read filePlaylist; do
   sort "$filePlaylist.cleaned"  > "$filePlaylist.sorted"
   ### End of playlist preparation
 
-  if [[ ! -z "$isRatingPlaylist" ]]
+  if [[ -n "$isRatingPlaylist" ]]
   then
     # we dont care of the order for rating playlist, hence the sort...
     comm -2 -3 "$filePlaylist.sorted" "$newBackup.sorted"  > "$filePlaylist.addedSinceLastBackup"
@@ -180,7 +183,7 @@ while read filePlaylist; do
     then
         echo "No changed occured for $filePlaylist since last backup."
         rm -f "$newBackup"
-    elif [ ! -z "$isNewSongsAdded" ]
+    elif [ -n "$isNewSongsAdded" ]
     then
         echo "The `wc -l < \"$filePlaylist.addedSinceLastBackup\"` song(s) added since last backup:"
         cat "$filePlaylist.addedSinceLastBackup" | sed 's/^/     /'
@@ -238,43 +241,49 @@ while read filePlaylist; do
   ######################
   [ ! -d "$GENERATED_PLAYLIST_DIRECTORY" ] && { mkdir "$GENERATED_PLAYLIST_DIRECTORY" ; }
 
-  # create a "BEST QUALITY playlist"
-  # backup of old playlist
-  if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u")
+
+  if [[ -z "$isRatingPlaylist" ]]
   then
-    echo "Backup best quality playlist"
-    mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u.bak"
+    # create a "BEST QUALITY playlist"
+    # backup of old playlist
+    if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u")
+    then
+      echo "Backup best quality playlist"
+      mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u.bak"
+    fi
+    echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
+    echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
+
+    # create new best quality playlist
+    selectDBRequest="SELECT CASE WHEN LOSSLESS != \"\" THEN LOSSLESS ELSE LOSSY END AS song
+                       FROM FILES AS f
+                       JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
+                       WHERE p.PLAYLISTNAME=\"$playlistName\"
+                       ORDER BY PLAYORDER ASC
+                       ; "
+    sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
+
+    # create a "MIN QUALITY playlist"
+    # backup of old playlist
+    if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u")
+    then
+      echo "Backup min quality playlist"
+      mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u.bak"
+    fi
+    echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+    echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+
+    # create new min quality playlist
+    selectDBRequest="SELECT CASE WHEN LOSSY != \"\" THEN LOSSY ELSE LOSSLESS END AS song
+                       FROM FILES AS f
+                       JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
+                       WHERE p.PLAYLISTNAME=\"$playlistName\"
+                       ORDER BY PLAYORDER ASC
+                       ; "
+    sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+  else
+    
   fi
-  echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
-  echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
-
-  # create new best quality playlist
-  selectDBRequest="SELECT CASE WHEN LOSSLESS != \"\" THEN LOSSLESS ELSE LOSSY END AS song
-                     FROM FILES AS f
-                     JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
-                     WHERE p.PLAYLISTNAME=\"$playlistName\"
-                     ORDER BY PLAYORDER ASC
-                     ; "
-  sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
-
-  # create a "MIN QUALITY playlist"
-  # backup of old playlist
-  if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u")
-  then
-    echo "Backup min quality playlist"
-    mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u.bak"
-  fi
-  echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
-  echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
-
-  # create new min quality playlist
-  selectDBRequest="SELECT CASE WHEN LOSSY != \"\" THEN LOSSY ELSE LOSSLESS END AS song
-                     FROM FILES AS f
-                     JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
-                     WHERE p.PLAYLISTNAME=\"$playlistName\"
-                     ORDER BY PLAYORDER ASC
-                     ; "
-  sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
 
   # Clean files
   if [ "$debug_mode" = 0 ]; then
