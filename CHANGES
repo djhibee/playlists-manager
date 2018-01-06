@@ -1,33 +1,19 @@
-#!/bin/bash
-# May be easily converted to sh compatible script if needed, since a very few bashisms are used ([[]]...)
-#
-# Synopsis:
-#       Install script dependencies
-#
-# Usage: bash ./install
-#
-# Pre-requisites:
+unreleased
+==========
 
-## External dependencies:
-  source utils.sh
-
-# History
-# Date            Version        Auteur        Commentaire
-# 25/07/2017       1.0            Djhibee       Creation
-
-####################################
-## TO CONFIGURE BEFORE USING SCRIPT
-####################################
-
-#######################
-# END OF CONFIGURATION
-#######################
-#######################
-## Other variables
-#######################
-
-brew install jq
+Features
+--------
 
 
+Bug Fixes
+---------
 
-endProg 0
+Deprecations
+------------
+
+Backward Incompatibilities
+--------------------------
+
+
+Documentation Changes
+---------------------

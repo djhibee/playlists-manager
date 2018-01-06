@@ -1,0 +1,16 @@
+PLaylists manager TODOs
+=============
+
+Nice-to-Have
+------------
+
+
+Future
+------
+
+-
+
+Probably Bad Ideas
+------------------
+
+- 
