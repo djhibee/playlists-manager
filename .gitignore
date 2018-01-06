@@ -4,3 +4,4 @@ getPairFile_result
 tmp/
 var/
 **/*.tmp
+**/@eaDir/
