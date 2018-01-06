@@ -30,6 +30,7 @@
 #   -> regenerate rating playlists from Synology API
 # For each playlist
 #   -> get previous playlist from SQLITE DB or beets if it's a ranking playlist
+#   -> Backup previous playlist to BACKUP_DIRECTORY
 #   -> compare both files
 #       -> if changes are complex (modification not at the end), regenerate the full playlist
 #       -> otherwise
@@ -40,7 +41,7 @@
 #         -> remove old files from DB playlist and update beet comments
 #           -> ./updatePlaylist.sh $playlist.removedSinceLastBackup remove
 #       -> regenerate max quality and min quality playlists in GENERATED_PLAYLIST_DIRECTORY after backup of old one
-#       -> backup PLAYLIST_DIRECTORY_TO_BACKUP to FULL_BACKUP_DIRECTORY
+#
 #
 # Useful commands:
 #     timestamp="$(date +'%Y%m%d%H%M')";while read playlist; do cp "$playlist" "./backups/$timestamp-$playlist"; done <  <(find *.m3u)
@@ -126,6 +127,7 @@ echo "Starting update of playlists in $PLAYLIST_DIRECTORY_TO_BACKUP..."
 PLAYLISTS_FILE="$TMP_DIRECTORY/playlists.tmp"
 find $PLAYLIST_DIRECTORY_TO_BACKUP -maxdepth 1 |  grep .m3u$ > "$PLAYLISTS_FILE"
 timestamp="$(date +'%Y%m%d%H%M')"
+[ ! -d "$BACKUP_DIRECTORY/$timestamp" ] && { mkdir "$BACKUP_DIRECTORY/$timestamp" ; }
 
 while read filePlaylist; do
 	echo "...Processing Playlist $filePlaylist..."
@@ -135,7 +137,7 @@ while read filePlaylist; do
   isRatingPlaylist=`echo $playlistName | grep -e '[54321]-stars'`
 
   ### Prepare backup playlist file
-  newBackup="$BACKUP_DIRECTORY/$timestamp-$playlistName.m3u"
+  newBackup="$BACKUP_DIRECTORY/$timestamp/$timestamp-$playlistName.m3u"
   echo "Previous $playlistName is backuped in $newBackup"
 
   # Since rating playlists are not stored in DB, we create them from beets
@@ -328,15 +330,15 @@ while read filePlaylist; do
 done < "$PLAYLISTS_FILE"
 
 # creationDate=`echo $playlist|awk -F _ '{print $1$2}'|sed 's/h//g'`
-# backup PLAYLIST_DIRECTORY_TO_BACKUP  to FULL_BACKUP_DIRECTORY
-echo "Backup full playlist repo"
-[ ! -d "$FULL_BACKUP_DIRECTORY" ] && { mkdir "$FULL_BACKUP_DIRECTORY" ; }
-cp -a "$PLAYLIST_DIRECTORY_TO_BACKUP" "$FULL_BACKUP_DIRECTORY/playlists-$timestamp"
+# backup Quality playlists  to QUALITY_BACKUP_DIRECTORY
+#echo "Backup quality playlist repo"
+#[ ! -d "$QUALITY_BACKUP_DIRECTORY" ] && { mkdir "$QUALITY_BACKUP_DIRECTORY" ; }
+#cp -a "$GENERATED_PLAYLIST_DIRECTORY" "$QUALITY_BACKUP_DIRECTORY/playlists-$timestamp"
 #delete useless @eadir direcotries
-find "$FULL_BACKUP_DIRECTORY/playlists-$timestamp" -type d -name "@eaDir" -print0 | xargs -0 rm -rf
+#find "$QUALITY_BACKUP_DIRECTORY/playlists-$timestamp" -type d -name "@eaDir" -print0 | xargs -0 rm -rf
 
 # Clean files
-if [ "$debug_mode" -eq 0 ]; then
+if [ "$debug_mode" -lt 1 ]; then
   rm -f "$PLAYLISTS_FILE"
 fi
 
