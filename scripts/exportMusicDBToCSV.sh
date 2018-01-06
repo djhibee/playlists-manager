@@ -28,6 +28,7 @@
 # More explanation there: https://support.microsoft.com/en-gb/help/323626/sylk-file-format-is-not-valid-error-message-when-you-open-file
 #
 # External dependencies:
+      source ${BASH_SOURCE%/*}/../SETTINGS
       source ${BASH_SOURCE%/*}/utils.sh
 #   geopts for input parameters parsing
 #
@@ -38,7 +39,7 @@
 ####################################
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
-debug_mode=0
+debug_mode=${debug_mode:-0}
 # the default output file where to store the db export
 OUTPUT_FILE_DEFAULT="$VAR_DIRECTORY/musicDB-export.txt"
 #######################

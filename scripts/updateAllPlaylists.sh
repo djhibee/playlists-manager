@@ -17,6 +17,7 @@
 #   NOTE : This script should handle multi quality playlist for non ranking ones (not tested)
 #
 ## External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   generateRatingPlaylist.sh
 #   updatePlaylist.sh
@@ -53,11 +54,7 @@
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
 
-# Directory where all music related stuff is backuped
-FULL_BACKUP_DIRECTORY="$PROJECT_DIRECTORY/var/backups-full"
-# Directory where playlists are backuped
-BACKUP_DIRECTORY="$PROJECT_DIRECTORY/var/backups"
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 
 #######################
 # END OF CONFIGURATION

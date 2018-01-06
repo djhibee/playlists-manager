@@ -1,0 +1,41 @@
+PLaylists manager TODOs
+=============
+
+Nice-to-Have
+------------
+
+- Script to convert flac to mp3 (install lame if not done)
+      => lame -V0 --vbr-new infile outfile
+- Script to dowsample flac and convert to mp3 (from Apollo's Adele 21):
+    sox lossless-24bit.flac -G -b 16 lossless-16bit.flac rate -v -L 44100 dither
+    avconv -i losless-16bit.flac -codec:a libmp3lame -q:a 0 output.mp3
+    Maybe use  Sox option -S
+
+
+    sox --i <filename>
+    to produce output such as:
+
+    Input File : 'final.flac'
+    Channels : 4
+    Sample Rate : 44100
+    Precision : 16-bit
+    Duration : 00:00:11.48 = 506179 samples = 860.849 CDDA sectors
+    File Size : 2.44M
+    Bit Rate : 1.70M
+    Sample Encoding: 16-bit FLAC
+    Comment : 'Comment=Processed by SoX'
+
+
+- Script to check songs only in flac format and convert them to mp3 in order to include in playlists
+- createNASPlaylistFromItunesPlaylist => to handle also flac files
+
+
+Future
+------
+
+-
+
+Probably Bad Ideas
+------------------
+
+- Script to convert flac to apple lossless => NOT needed with iOS11. They support flac now.

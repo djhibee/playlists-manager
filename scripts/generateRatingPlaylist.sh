@@ -15,6 +15,7 @@
 #               5. Music directory's basename is 'music'. Otherwise need to modify sed command at line 131 below # WARNING! DEPENDS ON YOUR MUSIC DIRECTORY PATH
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #                       - Awk
 #                       - curl
@@ -34,13 +35,7 @@
 ####################################
 # TO CONFIGURE BEFORE USING SCRIPT #
 ####################################
-# Synology user
-SYNO_SS_USER="toto"
-# Corresponding pwd
-SYNO_SS_PASS="thePass"
-# Syno server address
-SYNO_URL="192.168.0.20:5001"
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 
 #######################
 # END OF CONFIGURATION

@@ -10,6 +10,7 @@
 # Pre-requisites:
 #
 ## External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   lame library
 #   sox library
@@ -32,7 +33,7 @@
 SOURCE_DIRECTORY_DEFAULT="$PROJECT_DIRECTORY/tests/flacToConvert"
 # Default directory for generated mp3 files
 OUTPUT_DIRECTORY_DEFAULT="$PROJECT_DIRECTORY/tests/generatedMp3"
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 
 #######################
 # END OF CONFIGURATION

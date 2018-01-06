@@ -27,7 +27,7 @@
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
 # Beets' config for library to clean
-CONFIG_MP3="/Users/superToto/.config/beets/config-mp3.yaml"
+CONFIG_MP3="/Users/superToto/.config/beets/config.yaml"
 # Default file to use if no param was given in input
 FILE_PLAYLIST_DEFAULT="./toto.m3u"
 

@@ -15,6 +15,7 @@
 #   SQLite installed
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   geopts for input parameters parsing
 #
@@ -30,7 +31,7 @@
 ####### Global variables #######
 
 ######## Shell variables ##########
-debug_mode=0
+debug_mode=${debug_mode:-0}
 
 #######################
 # END OF CONFIGURATION

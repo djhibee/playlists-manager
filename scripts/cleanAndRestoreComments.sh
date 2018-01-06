@@ -11,11 +11,11 @@
 # 16/07/2017      1.0            Djhibee       Creation
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 
 beet -c $CONFIG_LOSSY modify -M -y comments=""
 beet -c $CONFIG_LOSSLESS modify -M -y comments=""
-
 
 beet -c $CONFIG_LOSSY modify -M -y  albumartist:"AC/DC" album:"Fly on the Wall" comments="1985 Atlantic 81263-1-E Original US Pressing, "
 beet -c $CONFIG_LOSSY modify -M -y  albumartist:"AC/DC" album:"Stiff upper Lip" comments="bootleg, 7559-62494-1, Sony 180g LP (2003); Mastered by George Marino @ Sterling Sound, NYC, Sony 180g LP (2003); "
