@@ -1,3 +1,4 @@
+-- SQLITE script to create DB tables
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 CREATE TABLE FILES(

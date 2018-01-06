@@ -18,6 +18,7 @@
 # Pre-requisites:
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   SQLite DB created according to createSQLiteDB.sql
 #   geopts for input parameters parsing
@@ -47,7 +48,7 @@ MAIN_FILE_ONE_STAR_LIST=${MAIN_FILE_ONE_STAR_LIST:-"$VAR_DIRECTORY/mainFileOneSt
 LAST_CHANCE_MATCHES_TO_REVIEW=${LAST_CHANCE_MATCHES_TO_REVIEW:-"$VAR_DIRECTORY/lastChanceMatchesToReview.txt"}
 # Stores all songs not found in beets library (no process possible so..)
 MAIN_FILE_NOT_FOUND_LIST=${MAIN_FILE_NOT_FOUND_LIST:-"$VAR_DIRECTORY/mainFileNotFoundList.txt"}
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 #######################
 # END OF CONFIGURATION
 #######################

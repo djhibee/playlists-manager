@@ -28,42 +28,78 @@
 #       -> extract album_Path from first mp3
 #       -> synoindex -A $album_path
 #
-# usage: bash ./01_synoindexNewImports timestamp avec timestamp format=%Y%m%d%H%M (e.g 201609120540)
+# usage: bash ./synoindexNewImports -h
 # Si pas de timetamp fourni, on prend la date courante
-# History
-# Date            Version        Auteur        Commentaire
-# 07//09/2016      1.0            JB Chapeland        Creation
-# 11//09/2016      2.0            JB Chapeland        Cleaned
 
-IMPORT_FEEDS_DIRECTORY="/volume1/music/playlists/imports"
+
+# External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
+    source ${BASH_SOURCE%/*}/utils.sh
+
+
+####################################
+## TO CONFIGURE BEFORE USING SCRIPT
+####################################
+
+####### Global variables #######
+
+######## Shell variables ##########
+debug_mode=${debug_mode:-0}
+#######################
+# END OF CONFIGURATION
+#######################
+
+
 TIME_STAMP_DEFAULT="$(date +'%Y%m%d%H%M')"
 
-debug_mode=0
+function usage {
+  echo "USAGE: $0 [-h] [-t timestamp]
 
-# Print debug logs if debug_mode==true
-function log {
-  if [ "$debug_mode" = 1 ]; then
-    echo "$1"
-    printf "\r"
-  fi
+             -t : The timestamp from where indexing new imports, with timestamp format=%Y%m%d%H%M (e.g 201609120540)
+             -h --help : Display this message
+        "
+  exit 0
 }
 
-if [ "$debug_mode" = 1 ]; then
-  echo "debug mode is ON"
-else
-  echo "debug mode is OFF"
-fi
+# Set shell attributes and initialize output files
+function initialize {
+  if [[ $1 =~ ^--help ]]; then
+    usage
+  fi
+  echo "$0 script started..."
+  if [ "$debug_mode" -eq 1 ]; then
+    echo "debug mode is ON"
+  else
+    echo "debug mode is OFF"
+  fi
+  timestamp="$TIME_STAMP_DEFAULT"
+  while getopts "t:h" option
+  do
+    case $option in
+      h)
+        usage
+        ;;
+      t)
+        timestamp="$OPTARG";
+        ;;
+      :)
+        endProg 1 "Option $OPTARG needs an argument" ;
+        ;;
+      \?)
+        endProg 1 "$OPTARG : invalid option" ;
+        ;;
+    esac
+  done
+}
 
-echo "... Get parameters"
-if [ $# -gt 0 ]; then
-	timestamp=$1
-else
-  timestamp=$TIME_STAMP_DEFAULT
-fi
+##########
+#  Main
+##########
+initialize "$@"
 
 echo "... Starting $IMPORT_FEEDS_DIRECTORY processing..."
 # filter only .m3u file from given IMPORT_FEEDS_DIRECTORY
-ls -1  $IMPORT_FEEDS_DIRECTORY |  grep .m3u$ > playlists.tmp
+ls -1  $IMPORT_FEEDS_DIRECTORY |  grep .m3u$ > "$TMP_DIRECTORY/playlists.tmp"
 
 while read playlist; do
 	log "Playlist is $playlist"
@@ -81,9 +117,9 @@ while read playlist; do
     synoindex -A "$album"
     log "$album"
   fi
-done < "playlists.tmp"
+done < "$TMP_DIRECTORY/playlists.tmp"
 
 # Clean files
-if [ "$debug_mode" = 0 ]; then
-  rm -f "playlists.tmp"
+if [ "$debug_mode" -lt 1 ]; then
+  rm -f "$TMP_DIRECTORY/playlists.tmp"
 fi

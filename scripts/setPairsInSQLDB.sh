@@ -13,6 +13,7 @@
 #             200: $csvFile is not a file
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   SQLite DB created according to createSQLiteDB.sql
 #   geopts for input parameters parsing
@@ -42,7 +43,7 @@
 ####################################
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 # Used to restore IFS at the end of the process in case we source the script
 OLDIFS=$IFS
 # Character used to separate columns in the csv file

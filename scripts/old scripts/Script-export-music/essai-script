@@ -1,0 +1,62 @@
+#!/bin/bash
+# AUTHOR: Djhibee
+# That script is aimed to export iTunes library to another destination, excluding music files whose album is included
+# in the list given in parameter. These files will be exported in a directory named of the album title. Such a
+# functionality let the user the choice to maintain a library organized by artist, but with some file containing music
+# compilation.Thus, it will avoid polluting the arborescence with directories containing infamous artists.
+
+# WARNING!!!!
+# Album names contained in the excluding list MUST be trimmed, otherwise they won't be recognized. This is done to
+# enhance performances by avoiding a "sed" call…
+
+# Syntaxe examples to keep in mind…
+# if [[ "${line##*.}" = "mp3" ]]
+#for REP in `find .` ; do
+	#if [ -f $REP ] ; then
+#		echo $REP
+	#else
+	#	echo "On ne renomme pas $FICH car ce n'est pas un fichier" >> toto.txt
+	#fi   | awk '/Album/ {  print substr($0,9,length($0)) }'
+
+#done
+
+
+copy_file () {
+ cat ./compilation_albums.txt | while read album_excluded
+     do
+        # we trim the current_album to ensure recognition
+	file_album_trim=`echo $1 | sed 's/^ *\(.*\) *$/\1/'`
+        #echo B"$album_excluded"B
+	#echo "C${file_album_trim}"C
+	if [[ "$file_album_trim" = "$album_excluded" ]]
+   	then
+		#if the directory does not exist we create it before
+		if !(test -d "./$destination/$album_excluded/")
+                then
+			mkdir "./$destination/$album_excluded/"
+		fi
+		`cp -f "$2" "./$destination/$album_excluded/"`;
+
+	else
+                `cp -fpR "$2" "./$destination/"`
+  	fi
+    done
+ }
+
+
+root_directory=`pwd`
+echo -n "Entrez le repertoire de destination: "
+read destination
+# Parcours tous les fichiers et regarde l'album
+find . | while read line
+do
+  # We don't care about directories and empty directories won't be exported
+  #echo $line
+  if [ ! -d "$line" ]
+    then
+	current_album=`id3tool "$line" | awk '/Album/ {  print substr($0,9,length($0)) }'`
+  	#echo $current_album
+  	copy_file "$current_album" "$line"
+
+  fi
+done

@@ -34,6 +34,7 @@
 #   WARNING ISSUE: No space allowed in playlists! => because if [ ! -f $playlistFile ]; failed otherwise
 
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   updateFileComments.sh
 #   getPairFile.sh
@@ -70,7 +71,7 @@ PROCESSED_FILE_DEFAULT="$TMP_DIRECTORY/processedFiles.tmp"
 # Comment update option chosen by default if not provided in input
 UPDATE_OPERATION_DEFAULT=$ADD_OPTION
 ######## Shell variables ##########
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 #######################
 # END OF CONFIGURATION
 #######################

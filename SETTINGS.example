@@ -18,6 +18,12 @@
 ####### Global variables #######
 # Playlist-manager root directory
 export PROJECT_DIRECTORY="/Users/dummy/git_clones/playlists-manager"
+# Synology user
+SYNO_SS_USER="toto"
+# Corresponding pwd
+SYNO_SS_PASS="thePass"
+# Syno server address
+SYNO_URL="192.168.0.20:5001"
 
 ######## Shell variables ##########
 debug_mode=1

@@ -12,6 +12,7 @@
 #   config_lossless.yaml -> library_lossless.db
 #
 # External dependencies:
+    source ${BASH_SOURCE%/*}/../SETTINGS
     source ${BASH_SOURCE%/*}/utils.sh
 #   getPairFile.sh
 #
@@ -39,7 +40,7 @@
 ####################################
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
-debug_mode=${debug_mode:-1}
+debug_mode=${debug_mode:-0}
 
 #######################
 # END OF CONFIGURATION

@@ -27,4 +27,5 @@ def _tmpl_country(item):
             my_country = raw_input("Enter country (not found in musicbrainz): ")
             return my_country
         return artist_country.upper()
-    return 'XX'
+    my_country = raw_input("Enter country (not found in musicbrainz): ")
+    return my_country

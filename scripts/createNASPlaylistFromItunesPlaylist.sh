@@ -5,7 +5,7 @@
 #           Song order is conserved.
 #
 # Usage:
-#           ./createNASPlaylistFromItunesPlaylist itunePlaylist
+#           ./createNASPlaylistFromItunesPlaylist -h
 # Output:
 #            a file called itunePlaylist-NAS
 # Algo:
@@ -19,26 +19,32 @@
 # WARNING: No space allowed in playlists! => because if [ ! -f $filePlaylist ]; failed otherwise
 #
 # External dependencies:
-#                       - NEEDS AWK LIBRARY!!!!!
+        source ${BASH_SOURCE%/*}/../SETTINGS
+        source ${BASH_SOURCE%/*}/utils.sh
+#       - NEEDS AWK LIBRARY!!!!!
 #
 # History
 # Date            Version        Auteur        Commentaire
 # 06/11/2016      1.0            Djhibee        Creation
 
+
 ####################################
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
+
+####### Global variables #######
+
 # Beets' config for library
-CONFIG_MUSIC="/var/services/homes/djhibee/.config/beets/config.yaml"
+CONFIG_MUSIC="$CONFIG_LOSSY"
 # Default file to use in case no param was given in input
 FILE_PLAYLIST_DEFAULT="./toto.m3u"
-debug_mode=1
-RED_COLOR=${RED_COLOR:-'\033[0;31m'}
-NO_COLOR=${NO_COLOR:-'\033[0m'}
-LOG_COLOR_DEFAULT=${LOG_COLOR_DEFAULT:-$NO_COLOR}
+
+######## Shell variables ##########
+debug_mode=${debug_mode:-0}
 #######################
 # END OF CONFIGURATION
 #######################
+
 #####################
 ## Global variables
 #####################
@@ -47,44 +53,47 @@ countNotFoundFromPlaylist=0
 # Stores all songs from the itunes playlist for whose no corresponding file was found on NAS
 FILE_NOT_FOUND_ON_NAS=""
 
+function usage {
+  echo "USAGE: $0 [-h] [-p playlist]
 
-function log {
-  typeset logcolor
-  if [ $# -gt 1 ]; then
-  	logColor="$2"
-  else
-    logColor="$LOG_COLOR_DEFAULT"
+             -p : The Itunes playlist to replicate with songs from the NAS.
+             -h --help : Display this message
+        "
+  exit 0
+}
+
+# Set shell attributes and initialize output files
+function initialize {
+  if [[ $1 =~ ^--help ]]; then
+    usage
   fi
+  echo "$0 script started..."
   if [ "$debug_mode" -eq 1 ]; then
-    echoInColor "$1" "$logColor"
-  fi
-}
-
-function echoInColor {
-  typeset echoColor
-  if [ $# -gt 1 ]; then
-    echoColor="$2"
+    echo "debug mode is ON"
   else
-    echoColor="$LOG_COLOR_DEFAULT"
+    echo "debug mode is OFF"
   fi
-  echo -e "$echoColor $1"
-  printf "${LOG_COLOR_DEFAULT}\r"
+  filePlaylist="$FILE_PLAYLIST_DEFAULT"
+  while getopts "p:h" option
+  do
+    case $option in
+      h)
+        usage
+        ;;
+      p)
+        filePlaylist="$OPTARG";
+        ;;
+      :)
+        endProg 1 "Option $OPTARG needs an argument" ;
+        ;;
+      \?)
+        endProg 1 "$OPTARG : invalid option" ;
+        ;;
+    esac
+  done
+  log "Processed playlist is: $filePlaylist"
 }
 
-function endProg {
-    end=$1
-    args=$*
-    if [ $end -gt 0 ]; then
-        echoInColor "End of script with error:" "$RED_COLOR"
-        if [ $# -gt 1 ]; then
-            echoInColor "$args" "$RED_COLOR"
-        fi
-        exit $end
-    else
-        echoInColor "Script ended normally" "$LOG_COLOR_DEFAULT"
-        exit 0
-    fi
-}
 
 function datacheck {
     if [ ! -f "$filePlaylist" ]; then
@@ -100,32 +109,22 @@ function printNotFoundFile {
   countNotFoundFromPlaylist=$((countNotFoundFromPlaylist + 1))
 }
 
-echo "createNASPlaylistFromItunesPlaylist started..."
 
-if [ "$debug_mode" = 1 ]; then
-  echo "debug mode is ON"
-else
-  echo "debug mode is OFF"
-fi
-
-echo "... Get parameters"
-
-if [ $# -gt 0 ]; then
-	filePlaylist="$1"
-else
-    filePlaylist=$FILE_PLAYLIST_DEFAULT
-fi
+##########
+#  Main
+##########
+initialize "$@"
 
 FILE_NOT_FOUND_ON_NAS="$filePlaylist.notFoundOnNas.txt"
 
 echo "Processed playlist is: $filePlaylist"
-echo "Fichiers non trouves dumpes dans  $FILE_NOT_FOUND_ON_NAS"
+echo "Files not found are dumped in  $FILE_NOT_FOUND_ON_NAS"
 
 datacheck
 
 echo "... Starting $filePlaylist processing"
 # Replace \ by \\ and create a copy of the playlist to work on it
-sed 's/\r/\r\n/g' $filePlaylist > $filePlaylist.tmp
+sed 's/\r/\r\n/g' "$filePlaylist" > "$TMP_DIRECTORY/$filePlaylist.tmp"
 
 while read file; do
   fileProper="$file"
@@ -134,7 +133,7 @@ while read file; do
   log "Processing $fileProper"
   # Parse only extinf lines that contain artist and title of songs
   # example #EXTINF:261,Blame It (Original mix) - Jamiee Foxx feat. T-Pain
-  if echo $fileProper | grep -i "EXTINF"; then
+  if echo "$fileProper" | grep -i "EXTINF"; then
     # the following handles the case where , or - appears several times in artist or title
     tmp=`echo "$fileProper" | awk 'BEGIN { FS = "," ; ORS = "" ; } ; { for (i=2; i<NF; i++) print $i FS} ; { print $NF "\r\n"}'`
     #tmp=Blame It (Original mix) - Jamiee Foxx feat. T-Pain
@@ -147,18 +146,18 @@ while read file; do
     # get path on NAS from beet mp3 library
     # } must be escaped with $ (see beet doc)
     # We put it in a file because the result could return several paths
-    beet  -c $CONFIG_MUSIC list -p albumartist:"$artist" "title:$title" > file_Path_OnNas.tmp
+    beet  -c $CONFIG_MUSIC list -p albumartist:"$artist" "title:$title" > "$TMP_DIRECTORY/file_Path_OnNas.tmp"
     filefound=false
     while read pathOnNas; do
         if [[ ! -z "$pathOnNas" ]]
         then
           # song was found we take the first one returned
-          echo "$pathOnNas" >> $filePlaylist-NAS
+          echo "$pathOnNas" >> "$filePlaylist-NAS"
           echo "$pathOnNas"
           filefound=true
           break
         fi
-    done < file_Path_OnNas.tmp
+    done < "$TMP_DIRECTORY/file_Path_OnNas.tmp"
 
     if $filefound ; then
         log "the file was found we continue the loop to the next song"
@@ -168,14 +167,14 @@ while read file; do
       printNotFoundFile "$fileProper"
     fi
   fi
-done < "$filePlaylist.tmp"
+done < "$TMP_DIRECTORY/$filePlaylist.tmp"
 
 echo "number of files not found from playlist: $countNotFoundFromPlaylist"
 
 # Clean files
-if [ "$debug_mode" = 0 ]; then
-  rm -f "$file_Path_OnNas.tmp"
-  #rm -f "$filePlaylist.tmp"
+if [ "$debug_mode" -lt 1 ]; then
+  rm -f "$TMP_DIRECTORY/file_Path_OnNas.tmp"
+  rm -f "$TMP_DIRECTORY/$filePlaylist.tmp"
 fi
 
 endProg 0

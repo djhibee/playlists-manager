@@ -3,3 +3,4 @@ getPairFile_result
 **/.DS_Store
 tmp/
 var/
+**/*.tmp
