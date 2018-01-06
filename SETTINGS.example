@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Synopsis :
-#     Store all configurable variables used in scripts
+#     Store all configurable variables used in scripts.
+#     Update the file with your configuration and then rename it to SETTINGS only.
 #
 # Pre-requisites:
 #
@@ -19,11 +20,11 @@
 # Playlist-manager root directory
 export PROJECT_DIRECTORY="/Users/dummy/git_clones/playlists-manager"
 # Synology user
-SYNO_SS_USER="toto"
+export SYNO_SS_USER="toto"
 # Corresponding pwd
-SYNO_SS_PASS="thePass"
+export SYNO_SS_PASS="thePass"
 # Syno server address
-SYNO_URL="192.168.0.20:5001"
+export SYNO_URL="192.168.0.10:5001"
 
 ######## Shell variables ##########
 debug_mode=1
@@ -45,13 +46,19 @@ export CONFIG_LOSSY="$PROJECT_DIRECTORY/beetFiles/config.yaml"
 # Beets' config for lossless files
 export CONFIG_LOSSLESS="$PROJECT_DIRECTORY/beetFiles/config-lossless.yaml"
 # DB were to store playlists and pairs
-export SQLITEDB="$PROJECT_DIRECTORY/var/musicPairsAndPlaylists.db"
+export SQLITEDB="$VAR_DIRECTORY/musicPairsAndPlaylists.db"
 # Directory where manual playlists are stored (audio station playlists etc...)
-export PLAYLIST_DIRECTORY_TO_BACKUP="$PROJECT_DIRECTORY/var/playlists"
+export PLAYLIST_DIRECTORY_TO_BACKUP="$VAR_DIRECTORY/playlists"
 # Directory where max quality and min quality playlists are generated
-export GENERATED_PLAYLIST_DIRECTORY="$PROJECT_DIRECTORY/var/playlists-generated"
+export GENERATED_PLAYLIST_DIRECTORY="$VAR_DIRECTORY/playlists-generated"
 # Default directory for playlists generation
 export PLAYLIST_DIRECTORY_DEFAULT=$PLAYLIST_DIRECTORY_TO_BACKUP
+# Directory where all music related stuff is backuped
+export FULL_BACKUP_DIRECTORY="$VAR_DIRECTORY/backups-full"
+# Directory where playlists are backuped
+export BACKUP_DIRECTORY="$VAR_DIRECTORY/backups"
+# Directory where beets log imported songs
+export IMPORT_FEEDS_DIRECTORY=$( grep -E '^dir: ' $CONFIG_LOSSY  | sed 's/^dir: //' | sed 's/\/$//')
 # Directory for lossy music files. Do not append a / at the end
 export LOSSY_DIRECTORY=$( grep -E '^directory: ' $CONFIG_LOSSY  | sed 's/^directory: //' | sed 's/\/$//')
 # Default directory for music files
