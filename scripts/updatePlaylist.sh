@@ -1,4 +1,4 @@
--n#!/bin/bash
+#!/bin/bash
 # May be easily converted to sh compatible script if needed, since a very few bashisms are used ([[]]...)
 
 # Synopsis :
@@ -34,7 +34,7 @@
 #   WARNING ISSUE: No space allowed in playlists! => because if [ ! -f $playlistFile ]; failed otherwise
 
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   updateFileComments.sh
 #   getPairFile.sh
 #   SQLite DB created according to createSQLiteDB.sql
@@ -63,10 +63,10 @@
 
 ####### Global variables #######
 # File to use by default in case no param was given
-FILE_PLAYLIST_DEFAULT="./toto.m3u"
+FILE_PLAYLIST_DEFAULT="$VAR_DIRECTORY/toto.m3u"
 # Store processed files in order not to re-process them
 # in case of a stop before the full parsing of the playlist
-PROCESSED_FILE_DEFAULT="./processedFiles.tmp"
+PROCESSED_FILE_DEFAULT="$TMP_DIRECTORY/processedFiles.tmp"
 # Comment update option chosen by default if not provided in input
 UPDATE_OPERATION_DEFAULT=$ADD_OPTION
 ######## Shell variables ##########
@@ -234,15 +234,15 @@ function initialize {
   then
     echo "Removing old playlist $playlistName"
     # Remove from lossy and lossless comments:
-    beet  -c $CONFIG_LOSSY list -p comments:"$playlistName" | sort -fb | tr -d '\r' > "old$playlistName.tmp"
-    beet  -c $CONFIG_LOSSLESS list -p  comments:"$playlistName" | sort -fb | tr -d '\r' >> "old$playlistName.tmp"
+    beet  -c $CONFIG_LOSSY list -p comments:"$playlistName" | sort -fb | tr -d '\r' > "$TMP_DIRECTORY/old$playlistName.tmp"
+    beet  -c $CONFIG_LOSSLESS list -p  comments:"$playlistName" | sort -fb | tr -d '\r' >> "$TMP_DIRECTORY/old$playlistName.tmp"
     while read file; do
       fileProper="$file"
       if [ -n "$fileProper" ] && [ "$fileProper" != "" ] && [ "$fileProper" ]
       then
         $UPDATE_FILE_COMMENTS_SCRIPT_PATH -c -s "$fileProper" -p "$playlistName" -u "$REMOVE_OPTION" -r "-1" | sed 's/^/     /'
       fi
-    done < "old$playlistName.tmp"
+    done < "$TMP_DIRECTORY/old$playlistName.tmp"
 
     # Remove from DB
     deleteDBRequest="DELETE
@@ -256,10 +256,10 @@ function initialize {
 
 function cleanFiles {
   # Replace \r by \r\n (if file created on OSX) and create a copy of the playlist to work on it
-  sed 's/\r$/\r\n/g' $playlistFile > $playlistFile.tmp2
+  sed 's/\r$/\r\n/g' "$playlistFile" > "$playlistFile.tmp2"
   # Replace \ by \\ for string regex
-  sed 's/\\/\\\\/g' $playlistFile.tmp2 > $playlistFile.tmp
-  rm -f $playlistFile.tmp2
+  sed 's/\\/\\\\/g' "$playlistFile.tmp2" > "$playlistFile.tmp"
+  rm -f "$playlistFile.tmp2"
 }
 
 initialize "$@"
@@ -345,9 +345,9 @@ echo "number of files not found from beets: $countMainFilesNotFound"
 
 # Clean files
 if [ "$debug_mode" -eq 0 ]; then
-  rm -f "$file_pairFilePath.tmp"
+  rm -f "$TMP_DIRECTORY/$file_pairFilePath.tmp"
   rm -f "$playlistFile.tmp"
-  rm -f "old$playlistName.tmp"
+  rm -f "$TMP_DIRECTORY/old$playlistName.tmp"
 fi
 
 endProg 0

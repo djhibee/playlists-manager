@@ -7,7 +7,7 @@
 #       Update files Beets' comments accordingly.
 #       Use a SQLite DB to store playlists
 #
-# Usage: bash ./updateAllPlaylists.sh $useSQLiteDBOption
+# Usage: bash ./updateAllPlaylists.sh -h
 #
 # Pre-requisites:
 #   Playlist can use either relatives or absolutes paths to identify the songs
@@ -17,7 +17,7 @@
 #   NOTE : This script should handle multi quality playlist for non ranking ones (not tested)
 #
 ## External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   generateRatingPlaylist.sh
 #   updatePlaylist.sh
 #   sed and comm commands
@@ -28,7 +28,7 @@
 # Get all playlists in PLAYLIST_DIRECTORY_TO_BACKUP
 #   -> regenerate rating playlists from Synology API
 # For each playlist
-#   -> get previous playlist from SQLITE DB or beets if ranking it's a ranking playlist
+#   -> get previous playlist from SQLITE DB or beets if it's a ranking playlist
 #   -> compare both files
 #       -> if changes are complex (modification not at the end), regenerate the full playlist
 #       -> otherwise
@@ -38,7 +38,7 @@
 #           -> ./updatePlaylist.sh $playlist.addedSinceLastBackup add
 #         -> remove old files from DB playlist and update beet comments
 #           -> ./updatePlaylist.sh $playlist.removedSinceLastBackup remove
-#       -> regenerate max quality and min quality playlists GENERATED_PLAYLIST_DIRECTORY after backup of old one
+#       -> regenerate max quality and min quality playlists in GENERATED_PLAYLIST_DIRECTORY after backup of old one
 #       -> backup PLAYLIST_DIRECTORY_TO_BACKUP to FULL_BACKUP_DIRECTORY
 #
 # Useful commands:
@@ -54,9 +54,9 @@
 ####################################
 
 # Directory where all music related stuff is backuped
-FULL_BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/tests/backups-full"
+FULL_BACKUP_DIRECTORY="$PROJECT_DIRECTORY/var/backups-full"
 # Directory where playlists are backuped
-BACKUP_DIRECTORY="$SCRIPTS_DIRECTORY/tests/backups"
+BACKUP_DIRECTORY="$PROJECT_DIRECTORY/var/backups"
 debug_mode=${debug_mode:-1}
 
 #######################
@@ -120,13 +120,14 @@ initialize "$@"
 echo "Starting update of playlists in $PLAYLIST_DIRECTORY_TO_BACKUP..."
 
 # Get dynamic rating playlists from AudioStation
-for i in `seq 1 5`
-do
-  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH -r "$i" -p "$PLAYLIST_DIRECTORY_TO_BACKUP"
-done
+#for i in `seq 1 5`
+#do
+#  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH -r "$i" -p "$PLAYLIST_DIRECTORY_TO_BACKUP"
+#done
 
 # filter only .m3u file from given PLAYLIST_DIRECTORY_TO_BACKUP
-find $PLAYLIST_DIRECTORY_TO_BACKUP -maxdepth 1 |  grep .m3u$ > playlists.tmp
+PLAYLISTS_FILE="$TMP_DIRECTORY/playlists.tmp"
+find $PLAYLIST_DIRECTORY_TO_BACKUP -maxdepth 1 |  grep .m3u$ > "$PLAYLISTS_FILE"
 timestamp="$(date +'%Y%m%d%H%M')"
 
 while read filePlaylist; do
@@ -207,7 +208,7 @@ while read filePlaylist; do
     playlistLength=`wc -l < "$filePlaylist.cleaned" | sed -e 's/^[ \t]*//'`
     minLenght=$(($backupLength<$playlistLength?$backupLength:$playlistLength))
     comm -3 <(head -n $minLenght "$filePlaylist.cleaned") <(head -n $minLenght "$newBackup.cleaned") > "$filePlaylist.checkOrderChange"
-    if [[ -s $filePlaylist.checkOrderChange ]] ; then
+    if [[ -s "$filePlaylist.checkOrderChange" ]] ; then
       echo "Playlist song orders changed, we need to rebuild the full playlist"
       $UPDATE_MUSIC_FILES_AND_SQLDB_SCRIPT_PATH $useLastChanceMatchOption -p "$filePlaylist.cleaned" -u "add" -d -o |  sed 's/^/     /'
     else
@@ -220,14 +221,14 @@ while read filePlaylist; do
           if [ $minLenght -eq $backupLength ]
           then
             newSongsLines=$((playlistLength-backupLength))
-            tail -n $newSongsLines $filePlaylist.cleaned > "$filePlaylist.addedSinceLastBackup"
+            tail -n $newSongsLines "$filePlaylist.cleaned" > "$filePlaylist.addedSinceLastBackup"
             echo "$newSongsLines song(s) added since last backup: "
             cat "$filePlaylist.addedSinceLastBackup" | sed 's/^/     /'
             # we dont use the -o option since the given playlist is a diff and not the complete one
             $UPDATE_MUSIC_FILES_AND_SQLDB_SCRIPT_PATH $useLastChanceMatchOption -p "$filePlaylist.addedSinceLastBackup" -u "add" -d | sed 's/^/     /'
           else
             newSongsLines=$((backupLength-playlistLength))
-            tail -n $newSongsLines $newBackup.cleaned > "$filePlaylist.removedSinceLastBackup"
+            tail -n $newSongsLines "$newBackup.cleaned" > "$filePlaylist.removedSinceLastBackup"
             echo "$newSongsLines song(s) removed since last backup: "
             cat "$filePlaylist.removedSinceLastBackup" | sed 's/^/     /'
             $UPDATE_MUSIC_FILES_AND_SQLDB_SCRIPT_PATH $useLastChanceMatchOption -p "$filePlaylist.removedSinceLastBackup" -u "remove" -d | sed 's/^/     /'
@@ -241,20 +242,19 @@ while read filePlaylist; do
   ######################
   [ ! -d "$GENERATED_PLAYLIST_DIRECTORY" ] && { mkdir "$GENERATED_PLAYLIST_DIRECTORY" ; }
 
+  # create a "BEST QUALITY playlist"
+  # backup of old playlist
+  if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u")
+  then
+    echo "Backup best quality playlist"
+    mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u.bak"
+  fi
+  echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
+  echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
 
+  # create new playlist
   if [[ -z "$isRatingPlaylist" ]]
   then
-    # create a "BEST QUALITY playlist"
-    # backup of old playlist
-    if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u")
-    then
-      echo "Backup best quality playlist"
-      mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u.bak"
-    fi
-    echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
-    echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
-
-    # create new best quality playlist
     selectDBRequest="SELECT CASE WHEN LOSSLESS != \"\" THEN LOSSLESS ELSE LOSSY END AS song
                        FROM FILES AS f
                        JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
@@ -262,18 +262,22 @@ while read filePlaylist; do
                        ORDER BY PLAYORDER ASC
                        ; "
     sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
+  fi
 
-    # create a "MIN QUALITY playlist"
-    # backup of old playlist
-    if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u")
-    then
-      echo "Backup min quality playlist"
-      mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u.bak"
-    fi
-    echo "Create new best quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
-    echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
 
-    # create new min quality playlist
+  # create a "MIN QUALITY playlist"
+  # backup of old playlist
+  if (test -e "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u")
+  then
+    echo "Backup min quality playlist"
+    mv -f "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u" "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u.bak"
+  fi
+  echo "Create new min quality playlist: $GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+  echo "#EXTM3U" > "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+
+  # create new playlist
+  if [[ -z "$isRatingPlaylist" ]]
+  then
     selectDBRequest="SELECT CASE WHEN LOSSY != \"\" THEN LOSSY ELSE LOSSLESS END AS song
                        FROM FILES AS f
                        JOIN PLAYLISTS AS p ON f.ID=p.TRACKID
@@ -281,8 +285,31 @@ while read filePlaylist; do
                        ORDER BY PLAYORDER ASC
                        ; "
     sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
-  
+  else
+    while read songFile; do
+      if echo "$songFile" | grep -i 'mp3\|flac\|m4a' | grep -i -v '#recycle\|@eaDir' > /dev/null ; then
+        ### identify the file music quality###
+        mainFileQuality="LOSSY"
+        if echo "$mainFile" | grep -i 'flac\|m4a' > /dev/null ; then
+          mainFileQuality="LOSSLESS"
+        fi
+        selectDBRequest="SELECT CASE WHEN LOSSLESS != \"\" THEN LOSSLESS ELSE LOSSY END
+                           FROM FILES
+                           WHERE $mainFileQuality=\"$songFile\"
+                           ORDER BY MATCH_TYPE ASC
+                           LIMIT 1
+                           ; "
+        sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.bestQuality.m3u"
 
+        selectDBRequest="SELECT CASE WHEN LOSSY != \"\" THEN LOSSY ELSE LOSSLESS END
+                           FROM FILES
+                           WHERE $mainFileQuality=\"$songFile\"
+                           ORDER BY MATCH_TYPE ASC
+                           LIMIT 1
+                           ; "
+        sqlite3 $SQLITEDB <<< "$selectDBRequest" >> "$GENERATED_PLAYLIST_DIRECTORY/$playlistName.minQuality.m3u"
+      fi
+    done < "$filePlaylist"
   fi
 
   # Clean files
@@ -301,7 +328,7 @@ while read filePlaylist; do
   echo "###################"
   echo "###################"
 
-done < "playlists.tmp"
+done < "$PLAYLISTS_FILE"
 
 # creationDate=`echo $playlist|awk -F _ '{print $1$2}'|sed 's/h//g'`
 # backup PLAYLIST_DIRECTORY_TO_BACKUP  to FULL_BACKUP_DIRECTORY
@@ -313,7 +340,7 @@ find "$FULL_BACKUP_DIRECTORY/playlists-$timestamp" -type d -name "@eaDir" -print
 
 # Clean files
 if [ "$debug_mode" -eq 0 ]; then
-  rm -f "playlists.tmp"
+  rm -f "$PLAYLISTS_FILE"
 fi
 
 echo "All Playlists were updated successfully".

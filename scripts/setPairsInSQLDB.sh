@@ -13,7 +13,7 @@
 #             200: $csvFile is not a file
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   SQLite DB created according to createSQLiteDB.sql
 #   geopts for input parameters parsing
 #
@@ -82,11 +82,11 @@ function datacheck {
 function cleanFiles {
   # Replace \r by \r\n (if file created on OSX) and create a copy of the playlist to work on it
   #set -x
-  sed 's/\r$/\r\n/g' "$songsFile" > "$songsFile.tmp"
+  sed 's/\r$/\r\n/g' "$songsFile" > "$TMP_DIRECTORY/$songsFile.tmp"
   # Replace \ by \\ for string regex
-  sed 's/\\/\\\\/g' "$songsFile.tmp" > "$songsFile.cleaned"
+  sed 's/\\/\\\\/g' "$TMP_DIRECTORY/$songsFile.tmp" > "$TMP_DIRECTORY/$songsFile.cleaned"
   #set +x
-  rm -f "$songsFile.tmp"
+  rm -f "$TMP_DIRECTORY/$songsFile.tmp"
 }
 
 # Handle that case:
@@ -274,10 +274,10 @@ do
       fi
     fi
 
-done < "$songsFile.cleaned"
+done < "$TMP_DIRECTORY/$songsFile.cleaned"
 
 if [ "$debug_mode" -eq 0 ]; then
-  rm -f "$songsFile.cleaned"
+  rm -f "$TMP_DIRECTORY/$songsFile.cleaned"
 fi
 
 IFS=$OLDIFS

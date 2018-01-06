@@ -34,7 +34,7 @@
 #
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   SQLite DB created according to the structure below
 #   sed command
 #
@@ -54,7 +54,7 @@
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
 # Temporary file where some DB requests' results will be stored
-DB_REQUEST_RESULT_TMP_FILE="updateFileCOmments_DB_results.txt"
+DB_REQUEST_RESULT_TMP_FILE="$TMP_DIRECTORY/updateFileCOmments_DB_results.txt"
 debug_mode=${debug_mode:-1}
 #######################
 # END OF CONFIGURATION

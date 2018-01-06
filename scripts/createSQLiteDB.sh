@@ -15,7 +15,7 @@
 #   SQLite installed
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   geopts for input parameters parsing
 #
 #

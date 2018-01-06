@@ -18,7 +18,7 @@
 # Pre-requisites:
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   SQLite DB created according to createSQLiteDB.sql
 #   geopts for input parameters parsing
 #
@@ -40,13 +40,13 @@
 ## TO CONFIGURE BEFORE USING SCRIPT
 ####################################
 # Stores all processed files for whose no pair was found (except 1-star ranked songs)
-PAIR_NOT_FOUND_LIST=${PAIR_NOT_FOUND_LIST:-"pairNotFoundList.txt"}
+PAIR_NOT_FOUND_LIST=${PAIR_NOT_FOUND_LIST:-"$VAR_DIRECTORY/pairNotFoundList.txt"}
 # Gathers all files with 1-star ranking without a pair. Used because we dont care of missing pairs for 1-star ranked songs
-MAIN_FILE_ONE_STAR_LIST=${MAIN_FILE_ONE_STAR_LIST:-"mainFileOneStarList.txt"}
+MAIN_FILE_ONE_STAR_LIST=${MAIN_FILE_ONE_STAR_LIST:-"$VAR_DIRECTORY/mainFileOneStarList.txt"}
 # In case of "LastChanceMatch", stores match pairs in order to review it later
-LAST_CHANCE_MATCHES_TO_REVIEW=${LAST_CHANCE_MATCHES_TO_REVIEW:-"lastChanceMatchesToReview.txt"}
+LAST_CHANCE_MATCHES_TO_REVIEW=${LAST_CHANCE_MATCHES_TO_REVIEW:-"$VAR_DIRECTORY/lastChanceMatchesToReview.txt"}
 # Stores all songs not found in beets library (no process possible so..)
-MAIN_FILE_NOT_FOUND_LIST=${MAIN_FILE_NOT_FOUND_LIST:-"mainFileNotFoundList.txt"}
+MAIN_FILE_NOT_FOUND_LIST=${MAIN_FILE_NOT_FOUND_LIST:-"$VAR_DIRECTORY/mainFileNotFoundList.txt"}
 debug_mode=${debug_mode:-1}
 #######################
 # END OF CONFIGURATION
@@ -175,7 +175,7 @@ function getPairFile {
     pairFilePath=`sqlite3 $SQLITEDB <<< "$selectDBRequest"`
   fi
 
-  if [[ -z "$pairFilePath" ]]
+  if [[ -z "$pairFilePath" ]] && [ "$only_use_db_for_pairs" -lt 1 ]
   then
     log "Try to find pairFile from Beets..."
     # pair file not present, we will guess it from mainfile's beets attributes
@@ -227,8 +227,8 @@ function getPairFile {
         # We put it in a file because the result could return several paths
         log "looking for artist:${array[0]} title:${array[2]}"
         # MAY USE REGEX for title if needed with "::" instruction
-        beet  -c $configPairFile list -p  artist:"${array[0]}" "title:${array[2]}" > file_pairFilePath.tmp
-        if [[ -s file_pairFilePath.tmp ]]
+        beet  -c $configPairFile list -p  artist:"${array[0]}" "title:${array[2]}" > "$TMP_DIRECTORY/file_pairFilePath.tmp"
+        if [[ -s "$TMP_DIRECTORY/file_pairFilePath.tmp" ]]
         then
           if [[ $mainFileQuality = "LOSSY" ]]
           then
@@ -243,7 +243,7 @@ function getPairFile {
           while read potentialMatches; do
             echo "$potentialMatches" >> "$LAST_CHANCE_MATCHES_TO_REVIEW"
             pairFilePath="$potentialMatches"
-          done < file_pairFilePath.tmp
+          done < "$TMP_DIRECTORY/file_pairFilePath.tmp"
         fi
       fi
 
@@ -253,7 +253,7 @@ function getPairFile {
     fi # mainFile in beets?
   else
     tupleAlreadyInDB=1
-    log "Pair File found in DB"
+    log "Pair File found in DB or search by tags disabled"
   fi # pair already present in sql db?
 
 }

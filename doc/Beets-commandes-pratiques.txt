@@ -1,0 +1,19 @@
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml modify "/Volumes/Jimi Hendrix/Guitar Signature licks/" artist:unknown albumartist:unknown
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml modify artist:Vivaldi artist="Antonio Vivaldi" composer="Antonio Vivaldi"
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml modify albumartist:"Vivaldi" albumartist="Antonio Vivaldi" composer="Antonio Vivaldi"
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml modify "/Volumes/music_mp3/The Who/The Who - Tommy (MFSL UDCD - 533)/" genre="Rock Opera" -a
+
+
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml move -c -p genre::"^Opera$" -d "/Volumes/music-mp3/"
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml move -c path::"^/Volumes/music_mp3/Abe.*"
+
+
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list "/Volumes/music_mp3/" "artist::[^\w0-9_. ,\-‐&\/\!\'?éÉêâ’\$äёüèʻçïöé()'àÖ\"ë“”:\^î\`,áñ+]" -f '$albumartist:$artist:$path'
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list -a  -f '$albumartist_sort' > artists2.txt
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list comp:"True" ^path:"/Volumes/Compilations/" ^path:"/Volumes/Musique Classique/" -f '$path'
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list path::"^/Volumes/music_mp3/Compilations/O.S.T" ^albumtype:soundtrack -f '$path:$genre:$albumtype'
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list ^path::"^/Volumes/music_mp3/Compilations/O.S.T"  albumtype:soundtrack -f '$path:$genre:$albumtype'
+beet -v -c ~/.config/beets/config-mp3-toProcess.yaml list ^path::"/Volumes/music_mp3/Musique Classique"/ genre:"Classical" -f '$path:$genre'
+
+
+

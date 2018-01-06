@@ -12,7 +12,7 @@
 #   config_lossless.yaml -> library_lossless.db
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #   getPairFile.sh
 #
 # Algo:
@@ -69,7 +69,7 @@ function usage {
              -f: file containing songs' paths to insert in DB
              -h --help : Display this message
              -l: try to match by artist and title in last chance match for pair songs
-             
+
 
         "
   exit 0
@@ -143,10 +143,10 @@ datacheck
 while read filePath; do
   # important to trim files from \r and \n !!!!!
   filePath=$(echo $filePath| tr -d '\n' | tr -d '\r' )
-  getPairFile_result="getPairFile_lastResult"
+  getPairFile_result="$TMP_DIRECTORY/getPairFile_lastResult"
   # Parse only lines that contain .mp3 or .flac/m4a files and not #recycle and @eadir
   if echo "$filePath" | grep -i 'mp3\|flac\|m4a' | grep -i -v '#recycle\|@eaDir' > /dev/null ; then
-    $GET_PAIR_FILE_SCRIPT_PATH -d $useLastChanceMatchOption -s "$filePath" -o $getPairFile_result
+    $GET_PAIR_FILE_SCRIPT_PATH -d $useLastChanceMatchOption -s "$filePath" -o "$getPairFile_result"
     # Handle main file not found error
     [ $? -eq 100 ] && {  countMainFilesNotFound=$((countMainFilesNotFound + 1)) ; }
     # Update stats and debug logs

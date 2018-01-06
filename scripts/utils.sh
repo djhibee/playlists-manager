@@ -16,18 +16,24 @@
 ####################################
 
 ####### Global variables #######
+# Playlist-manager root directory
+export PROJECT_DIRECTORY="/Users/jchapeland/git_clones/playlists-manager"
 # Directory where all music scripts are stored
-export SCRIPTS_DIRECTORY="/Users/jchapeland/git_clones/playlists-manager"
+export SCRIPTS_DIRECTORY="$PROJECT_DIRECTORY/scripts"
+# Directory where all temporary files are stored
+export TMP_DIRECTORY="$PROJECT_DIRECTORY/tmp"
+# Directory where all outputfiles files are stored
+export VAR_DIRECTORY="$PROJECT_DIRECTORY/var"
 # Beets' config for lossy files
-export CONFIG_LOSSY="$SCRIPTS_DIRECTORY/beetFiles/config.yaml"
+export CONFIG_LOSSY="$PROJECT_DIRECTORY/beetFiles/config.yaml"
 # Beets' config for lossless files
-export CONFIG_LOSSLESS="$SCRIPTS_DIRECTORY/beetFiles/config-lossless.yaml"
+export CONFIG_LOSSLESS="$PROJECT_DIRECTORY/beetFiles/config-lossless.yaml"
 # DB were to store playlists and pairs
-export SQLITEDB="$SCRIPTS_DIRECTORY/tests/musicPairsAndPlaylists.db"
+export SQLITEDB="$PROJECT_DIRECTORY/var/musicPairsAndPlaylists.db"
 # Directory where manual playlists are stored (audio station playlists etc...)
-export PLAYLIST_DIRECTORY_TO_BACKUP="$SCRIPTS_DIRECTORY/tests/playlists-lossy"
+export PLAYLIST_DIRECTORY_TO_BACKUP="$PROJECT_DIRECTORY/var/playlists"
 # Directory where max quality and min quality playlists are generated
-export GENERATED_PLAYLIST_DIRECTORY="$SCRIPTS_DIRECTORY/tests/playlists-generated"
+export GENERATED_PLAYLIST_DIRECTORY="$PROJECT_DIRECTORY/var/playlists-generated"
 # Default directory for playlists generation
 export PLAYLIST_DIRECTORY_DEFAULT=$PLAYLIST_DIRECTORY_TO_BACKUP
 # Directory for lossy music files. Do not append a / at the end
@@ -46,7 +52,9 @@ export NO_COLOR='\033[0m'
 export LOG_COLOR_DEFAULT=$NO_COLOR
 
 ######## Shell variables ##########
-debug_mode=0
+debug_mode=1
+# if 1, only look for pair files in DB, not with beets tags
+only_use_db_for_pairs=1
 
 #######################
 # END OF CONFIGURATION

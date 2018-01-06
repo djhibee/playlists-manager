@@ -15,7 +15,7 @@
 #               5. Music directory's basename is 'music'. Otherwise need to modify sed command at line 131 below # WARNING! DEPENDS ON YOUR MUSIC DIRECTORY PATH
 #
 # External dependencies:
-    source ./utils.sh
+    source ${BASH_SOURCE%/*}/utils.sh
 #                       - Awk
 #                       - curl
 # References:

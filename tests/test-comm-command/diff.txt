@@ -1,0 +1,11 @@
+--- fileA.txt	2017-07-20 12:01:57.000000000 +0200
++++ fileF-song-added-and-removed-in-middle-and-added-at-end.txt	2017-07-20 11:44:15.000000000 +0200
+@@ -1,5 +1,6 @@
+ a
+ b
+-c
+-d
++dfjeofheoh
++f
+ e
++h
