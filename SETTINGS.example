@@ -51,10 +51,8 @@ export SQLITEDB="$VAR_DIRECTORY/musicPairsAndPlaylists.db"
 export PLAYLIST_DIRECTORY_TO_BACKUP="$VAR_DIRECTORY/playlists"
 # Directory where max quality and min quality playlists are generated
 export GENERATED_PLAYLIST_DIRECTORY="$VAR_DIRECTORY/playlists-generated"
-# Default directory for playlists generation
+# Default directory for ranking playlists generation
 export PLAYLIST_DIRECTORY_DEFAULT=$PLAYLIST_DIRECTORY_TO_BACKUP
-# Directory where all music related stuff is backuped
-export FULL_BACKUP_DIRECTORY="$VAR_DIRECTORY/backups-full"
 # Directory where playlists are backuped
 export BACKUP_DIRECTORY="$VAR_DIRECTORY/backups"
 # Directory where beets log imported songs
