@@ -118,10 +118,10 @@ initialize "$@"
 echo "Starting update of playlists in $PLAYLIST_DIRECTORY_TO_BACKUP..."
 
 # Get dynamic rating playlists from AudioStation
-#for i in `seq 1 5`
-#do
-#  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH -r "$i" -p "$PLAYLIST_DIRECTORY_TO_BACKUP"
-#done
+for i in `seq 1 5`
+do
+  $GENERATE_RATING_PLAYLIST_SCRIPT_PATH -r "$i" -p "$PLAYLIST_DIRECTORY_TO_BACKUP"
+done
 
 # filter only .m3u file from given PLAYLIST_DIRECTORY_TO_BACKUP
 PLAYLISTS_FILE="$TMP_DIRECTORY/playlists.tmp"
