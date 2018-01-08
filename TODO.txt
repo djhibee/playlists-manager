@@ -4,13 +4,49 @@ PLaylists manager TODOs
 Nice-to-Have
 ------------
 
-- Script to convert flac to mp3 (install lame if not done)
-      => lame -V0 --vbr-new infile outfile
+- For last chance matches in getPairFile, avoid to match a live version with a studio version
+	=> identify live songs/albums from library and tag it using a flexible tag
+- Configure beet with http://beets.readthedocs.io/en/v1.4.6/plugins/convert.html plugin instead of using my convertFlacFiles.sh
+
+convert:
+    dest: ~/Music/Converted
+    copy_album_art: yes
+    never_convert_lossy_files: yes
+    pretend: no
+    threads: 4
+    format: mp3
+    formats:
+        aac:
+            command: ffmpeg -i $source -y -vn -acodec aac -aq 1 $dest
+            extension: m4a
+        alac:
+            command: ffmpeg -i $source -y -vn -acodec alac $dest
+            extension: m4a
+        flac: ffmpeg -i $source -y -vn -acodec flac $dest
+        mp3: ffmpeg -i $source -y -vn -aq 2 $dest
+        opus: ffmpeg -i $source -y -vn -acodec libopus -ab 96k $dest
+        ogg: ffmpeg -i $source -y -vn -acodec libvorbis -aq 3 $dest
+        wma: ffmpeg -i $source -y -vn -acodec wmav2 -vn $dest
+    max_bitrate: 500
+    auto: no
+    tmpdir:
+    quiet: no
+    embed: yes
+
+    paths: {}
+    album_art_maxwidth: 0
+
+- Use http://beets.readthedocs.io/en/v1.4.6/reference/query.html#datequery instead of import log files for synoIndexing  => beet ls -a 'added:-1w..'
+
+- use diff instead of comm for playlist changes
+	diff --unchanged-line-format="" --old-line-format=":rm:x-stars-#%dn: %L" --new-line-format=":add:x-stars-#%dn: %L" fileA.txt fileF-song-added-and-removed-in-middle-and-added-at-end.txt 
+
+   ===> does not work (see test-comm cases with file J for example)
+
 - Script to dowsample flac and convert to mp3 (from Apollo's Adele 21):
     sox lossless-24bit.flac -G -b 16 lossless-16bit.flac rate -v -L 44100 dither
     avconv -i losless-16bit.flac -codec:a libmp3lame -q:a 0 output.mp3
     Maybe use  Sox option -S
-
 
     sox --i <filename>
     to produce output such as:
@@ -26,7 +62,7 @@ Nice-to-Have
     Comment : 'Comment=Processed by SoX'
 
 
-- Script to check songs only in flac format and convert them to mp3 in order to include in playlists
+- Script to check for songs only in flac format and convert them to mp3 in order to include them in playlists
 - createNASPlaylistFromItunesPlaylist => to handle also flac files
 
 

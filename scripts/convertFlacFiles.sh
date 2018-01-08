@@ -3,7 +3,8 @@
 #
 # Synopsis:
 #       Highest level script.
-#       Convert Flac files to another format into Mp3,using lame V0 quality
+#       Convert Flac files to another format. For mp3 format,use lame V0 quality
+#       Better to use Beets convert plugin (http://beets.readthedocs.io/en/v1.4.6/plugins/convert.html) if you can
 #
 # Usage: bash ./convertFlacFiles.sh -h
 #
