@@ -94,8 +94,8 @@ usage="USAGE: $0 [-hcd] -s songPath -p playlistName [-u updateOperation] [-r son
       "
 
 function datacheck {
-    # TODO Uncomment when files are ready
-    #[ ! -f "$fileToUpdate" ] && { endProg 300 ": $fileToUpdate is not a file." ; }
+    # TODO Toggle comments when working on virtual library (files not available)
+    [ ! -f "$fileToUpdate" ] && { endProg 300 ": $fileToUpdate is not a file." ; }
     [[ ( -z "${fileToUpdate// }" ) || ( -z "${playlistName// }" ) ]] && { endProg 1 ": song file and playlist name are mandatory parameters (see --help) " ; }
     [ $updateOperation != "$REMOVE_OPTION" ] && [ $updateOperation != "$ADD_OPTION" ] && { endProg 900 ": update operation can only be \"$ADD_OPTION\" or \"$REMOVE_OPTION\" (see --help) " ; }
     [[ -n "$isRatingPlaylist" ]] && [[ $updateDB -eq 1 ]] && { updateDB=0 ; echo "Update DB option forced to 0 because $playlistName is a rating playlist." ; }
